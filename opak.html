@@ -36,7 +36,7 @@
     }).addTo(map);
 
     // Load GeoJSON dari server lokal
-    fetch('http://localhost:8000/json/Kelurahan_Opak.geojson')
+    fetch('https://yudhoi.github.io/webmapy/json/Kelurahan_Opak.geojson')
       .then(response => response.json())
       .then(data => {
         var geojsonLayer = L.geoJSON(data, {
