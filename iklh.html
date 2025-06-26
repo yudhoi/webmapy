@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Peta Jaringan Persampahan</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+      <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+  <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+    
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+        /* Style untuk wadah judul dan sub-judul */
+        .map-header {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+            font-family: Arial, sans-serif;
+            text-align: center; /* Agar teks di tengah */
+            white-space: nowrap; /* Mencegah teks terpotong */
+        }
+        .map-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px; /* Sedikit ruang di bawah judul */
+        }
+        .map-subtitle {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.4; /* Jarak antar baris */
+        }
+        /* Style untuk Legenda */
+        .info.legend {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+            line-height: 18px;
+            color: #555;
+            font-family: Arial, sans-serif;
+        }
+        .info.legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.8;
+            border-radius: 50%; /* Untuk membuat simbol bulat */
+        }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+<div class="map-header">
+    <div class="map-title">Peta Indeks Kualitas Lingkungan Hidup</div>
+    <div class="map-subtitle">
+        Visualisasi lokasi Mataair, Pengukuran Kualitas Udara, Pengukuran Kualitas Sungai dan Sumur.<br>
+        Informasi ini penting untuk pengelolaan sampah yang lebih baik.
+    </div>
+</div>
+<script>
+    // Inisialisasi peta Leaflet
+    var map = L.map('map').setView([-7.690992794458956, 110.37677710610576], 12);
+
+    // Tambahkan basemap OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Objek untuk menyimpan layer-layer data
+    var overlayMaps = {};
+    // Array untuk melacak semua promise fetch
+    var fetchPromises = [];
+
+    var legendData = [
+    { name: 'Sampel Sumur', color: 'red' },
+    { name: 'Mataair', color: 'green' },
+    { name: 'Kualitas Udara', color: 'purple' },
+    { name: 'Kualitas Air', color: 'orange' }
+];
+    // Fungsi untuk memuat dan menambahkan data GeoJSON
+    function loadGeoJSONLayer(filePath, layerName, popupProperty, markerColor = 'blue') {
+        const promise = fetch(filePath)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status} from ${filePath}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                var geoJsonLayer = L.geoJSON(data, {
+                    pointToLayer: function (feature, latlng) {
+                        // Anda bisa menyesuaikan radius atau properti lain jika perlu
+                        return L.circleMarker(latlng, {
+                            radius: 10,
+                            fillColor: markerColor,
+                            color: "#000",
+                            weight: 1,
+                            opacity: 1,
+                            fillOpacity: 0.8
+                        }).bindPopup(`<b>${layerName}</b><br>${feature.properties[popupProperty] || 'Tidak ada info'}`);
+                    }
+                });
+                overlayMaps[layerName] = geoJsonLayer; // Tambahkan ke objek overlayMaps
+                map.addLayer(geoJsonLayer); // Tambahkan layer ke peta secara default
+            })
+            .catch(error => {
+                console.error(`Error loading ${filePath}:`, error);
+            });
+        fetchPromises.push(promise); // Tambahkan promise ke array
+    }
+
+    // Muat data-data GeoJSON
+    loadGeoJSONLayer('json/Sumur_2023.geojson', 'Sampel Sumur', 'Lokasi_Sum', 'red');
+    loadGeoJSONLayer('json/mataair.geojson', 'Mataair', 'Lokasi', 'green');
+    loadGeoJSONLayer('json/lokasi_IKU_2023.geojson', 'Kualitas Udara', 'Peruntukan', 'purple');
+    loadGeoJSONLayer('json/lokasi_IKA_2023.geojson', 'Kualitas Air', 'LOKASI', 'orange');
+
+    // Tunggu semua promise fetch selesai, baru tambahkan kontrol layer
+    Promise.all(fetchPromises)
+        .then(() => {
+            // Inisialisasi kontrol layer hanya sekali
+            L.control.layers(null, overlayMaps).addTo(map);
+            console.log('Semua layer dimuat dan kontrol layer telah dibuat.');
+
+
+//urusan fullscreen
+map.isFullscreen() // Is the map fullscreen?
+map.toggleFullscreen() // Either go fullscreen, or cancel the existing fullscreen.
+
+// `fullscreenchange` Event that's fired when entering or exiting fullscreen.
+map.on('fullscreenchange', function () {
+    if (map.isFullscreen()) {
+        console.log('entered fullscreen');
+    } else {
+        console.log('exited fullscreen');
+    }
+});
+
+map.addControl(new L.Control.Fullscreen({
+    title: {
+        'false': 'View Fullscreen',
+        'true': 'Exit Fullscreen'
+    }
+}));
+
+            // Buat Legenda
+            var legend = L.control({position: 'bottomright'}); // Posisikan legenda di kanan bawah
+
+            legend.onAdd = function (map) {
+                var div = L.DomUtil.create('div', 'info legend');
+                var labels = [];
+
+                // Loop melalui data legenda untuk membuat entri
+                for (var i = 0; i < legendData.length; i++) {
+                    labels.push(
+                        '<i style="background:' + legendData[i].color + '"></i> ' +
+                        legendData[i].name
+                    );
+                }
+
+                div.innerHTML = '<h4>Keterangan</h4>' + labels.join('<br>');
+                return div;
+            };
+
+            legend.addTo(map); // Tambahkan legenda ke peta
+
+})
+        .catch(error => {
+            console.error('Ada kesalahan saat memuat salah satu layer:', error);
+        });
+
+</script>
+
+</body>
+</html>
