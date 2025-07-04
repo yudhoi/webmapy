@@ -1,216 +1,309 @@
 <!DOCTYPE html>
-<html xmlns="https://www.w3.org/1999/xhtml">
-<head>
-    <title>Peta Jaringan Persampahan</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=0.8, maximum-scale=0.8, user-scalable=no" />
- 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    
-    <link rel="stylesheet" href="src/leaflet-panel-layers.css" />
-    <script src="src/leaflet-panel-layers.js"></script>
+ <html xmlns="https://www.w3.org/1999/xhtml">
+ <head>
+     <title>Peta Jaringan Persampahan</title>
+     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=0.8, maximum-scale=0.8, user-scalable=no" />
 
-    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
-    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
-  
-    <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.js"></script>
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-    <style>
-        #map {
-            height: 100vh;
-            width: 100%;
-        }
-        /* Style untuk wadah judul dan sub-judul */
-        .map-header {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 10px 15px;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.3);
-            font-family: Arial, sans-serif;
-            text-align: center; /* Agar teks di tengah */
-            white-space: nowrap; /* Mencegah teks terpotong */
-        }
-        .map-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px; /* Sedikit ruang di bawah judul */
-        }
-        .map-subtitle {
-            font-size: 12px;
-            color: #555;
-            line-height: 1.4; /* Jarak antar baris */
-        }
+     <link rel="stylesheet" href="src/leaflet-panel-layers.css" />
+     <script src="src/leaflet-panel-layers.js"></script>
 
-        /* Tambahan style agar panel tidak tumpang tindih dengan judul */
-        .leaflet-panel-layers {
-            top: 0px !important; /* Sesuaikan dengan tinggi map-header Anda */
-           
-        }
+     <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+     <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
 
-    </style>
-</head>
+     <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.js"></script>
 
-<body>
-<div id="map"></div>
-<div class="map-header">
-    <div class="map-title">Peta Jaringan Persampahan</div>
-    <div class="map-subtitle">
-        Visualisasi lokasi KSM/BKM, Bank Sampah, Depo, Kontainer, dan TPS.<br>
-        Informasi ini penting untuk pengelolaan sampah yang lebih baik.
-    </div>
-</div>
+     <style>
+         #map {
+             height: 100vh;
+             width: 100%;
+         }
+         /* Style untuk wadah judul dan sub-judul */
+         .map-header {
+             position: absolute;
+             top: 10px;
+             left: 50%;
+             transform: translateX(-50%);
+             z-index: 1000;
+             background-color: rgba(255, 255, 255, 0.8);
+             padding: 10px 15px;
+             border-radius: 5px;
+             box-shadow: 0 0 5px rgba(0,0,0,0.3);
+             font-family: Arial, sans-serif;
+             text-align: center; /* Agar teks di tengah */
+             white-space: nowrap; /* Mencegah teks terpotong */
+         }
+         .map-title {
+             font-size: 18px;
+             font-weight: bold;
+             color: #333;
+             margin-bottom: 5px; /* Sedikit ruang di bawah judul */
+         }
+         .map-subtitle {
+             font-size: 12px;
+             color: #555;
+             line-height: 1.4; /* Jarak antar baris */
+         }
 
-<script>
-    var map = L.map('map', {
-        zoom: 12,
-        center: L.latLng([-7.690992794458956, 110.37677710610576]),
-        attributionControl: false, // Atribusi akan ditambahkan melalui basemap
-        maxBounds: L.latLngBounds([[-7.837,110.209],[-7.539,110.557]]).pad(0.5) // Hapus atau sesuaikan jika tidak perlu
-    });
+         /* Tambahan style agar panel tidak tumpang tindih dengan judul */
+         .leaflet-panel-layers {
+             top: 0px !important; /* Sesuaikan dengan tinggi map-header Anda */
 
-    // Tambahkan basemap OpenStreetMap
-    var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    });
-    map.addLayer(osmLayer);
+         }
+         /* Style untuk gambar di popup */
+         .popup-image {
+             max-width: 200px; /* Batasi lebar gambar */
+             height: auto;
+             display: block; /* Agar gambar berada di baris baru */
+             margin-top: 10px; /* Sedikit ruang di atas gambar */
+         }
 
-    var baseLayers = [
-        {
-            name: "Open Street Map",
-            layer: osmLayer
-            
-        },
-        // Anda bisa menambahkan basemap lain di sini jika diinginkan
-        // Contoh:
-    //    {
-    //         name: "OpenTopoMap",
-    //         layer: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-    //             attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-    //         })
-    //    }
-   ];
+         /* Membuat popup lebih transparan */
+         .leaflet-popup-content-wrapper {
+             background-color: rgba(255, 255, 255, 0.7) !important; /* Ubah nilai alpha (0.7) sesuai keinginan */
+             border-radius: 5px; /* Agar sudut tetap terlihat bagus */
+             box-shadow: 0 0 5px rgba(0,0,0,0.2); /* Sedikit bayangan agar tetap terlihat */
+         }
 
-    // Data untuk legenda dan properti layer
-    var layerDefinitions = [
-        { filePath: 'json/Lokasi_Ksm_bkm.geojson', layerName: 'Lokasi KSM/BKM', popupProperty: 'KSM__BKM', markerColor: 'red', active: true },
-        { filePath: 'json/Persampahan_bank_sampah.geojson', layerName: 'Bank Sampah', popupProperty: 'Nama', markerColor: 'green', active: true },
-        { filePath: 'json/Persampahan_depo.geojson', layerName: 'Depo Sampah', popupProperty: 'Nama', markerColor: 'purple', active: true },
-        { filePath: 'json/Persampahan_kontainer.geojson', layerName: 'Kontainer Sampah', popupProperty: 'Nama', markerColor: 'orange', active: true },
-        { filePath: 'json/Persampahan_tps.geojson', layerName: 'TPS', popupProperty: 'Nama_Lokas', markerColor: 'darkblue', active: true }
+         .leaflet-popup-tip {
+             background: rgba(255, 255, 255, 0.7) !important; /* Sesuaikan nilai alpha agar sesuai dengan wrapper */
+             border: none !important; /* Hilangkan border pada tip untuk tampilan lebih bersih */
+         }
+     </style>
+ </head>
+
+ <body>
+ <div id="map"></div>
+ <div class="map-header">
+     <div class="map-title">Peta Jaringan Persampahan</div>
+     <div class="map-subtitle">
+         Visualisasi lokasi KSM/BKM, Bank Sampah, Depo, Kontainer, dan TPS.<br>
+         Informasi ini penting untuk pengelolaan sampah yang lebih baik.
+     </div>
+ </div>
+
+ <script>
+     var map = L.map('map', {
+         zoom: 12,
+         center: L.latLng([-7.690992794458956, 110.37677710610576]),
+         attributionControl: false, // Atribusi akan ditambahkan melalui basemap
+         maxBounds: L.latLngBounds([[-7.837,110.209],[-7.539,110.557]]).pad(0.5) // Hapus atau sesuaikan jika tidak perlu
+     });
+
+     // Tambahkan basemap OpenStreetMap
+     var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+         opacity: 0.5 // Tambahkan baris ini untuk mengatur transparansi
+         
+     });
+     map.addLayer(osmLayer);
+
+     var baseLayers = [
+         {
+             name: "Open Street Map",
+             layer: osmLayer
+
+         },
     ];
 
-    var overLayers = [];
-    var fetchPromises = [];
+     // Mapping nama layer ke nama properti yang menentukan jenis objek dan mapping nilai properti ke ikon
+     var layerDefinitions = [
+         {
+             filePath: 'json/Lokasi_Ksm_bkm.geojson',
+             layerName: 'Lokasi KSM/BKM',
+             popupProperty: 'KSM__BKM',
+             iconProperty: null, // Asumsi ada properti 'jenis' di GeoJSON yang membedakan KSM dan BKM
+             iconMapping: {
+                 'KSM BKM': 'ksm.png'
+             },
+             active: true
+         },
+         {
+             filePath: 'json/Persampahan_bank_sampah.geojson',
+             layerName: 'Bank Sampah',
+             popupProperty: 'Nama',
+             iconProperty: null, // Mungkin tidak perlu properti khusus, bisa gunakan ikon default
+             iconMapping: {
+                 'Bank Sampah': 'banksampah.png' // Atau bisa langsung tentukan nama file jika semua sama
+             },
+             active: true
+         },
+         {
+             filePath: 'json/Persampahan_depo.geojson',
+             layerName: 'Depo Sampah',
+             popupProperty: 'Nama',
+             iconProperty: null,
+             iconMapping: {
+                 'Depo Sampah': 'depo.png'
+             },
+             active: true
+         },
+         {
+             filePath: 'json/Persampahan_kontainer.geojson',
+             layerName: 'Kontainer Sampah',
+             popupProperty: 'Nama',
+             iconProperty: null,
+             iconMapping: {
+                 'Kontainer': 'kontainer.png' // Sesuaikan jika ada variasi jenis kontainer
+             },
+             active: true
+         },
+         {
+             filePath: 'json/Persampahan_tps.geojson',
+             layerName: 'TPS',
+             popupProperty: 'Nama_Lokas',
+             iconProperty: null,
+             iconMapping: {
+                 'TPS': 'tps.png' // Sesuaikan jika ada variasi jenis TPS
+             },
+             active: true
+         }
+     ];
 
-    // Fungsi untuk memuat dan menambahkan data GeoJSON ke overLayers
-    function loadGeoJSONForPanel(def) {
-        const promise = fetch(def.filePath)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status} from ${def.filePath}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                var geoJsonLayer = L.geoJSON(data, {
-                    pointToLayer: function (feature, latlng) {
-                        return L.circleMarker(latlng, {
-                            radius: 6,
-                            fillColor: def.markerColor,
-                            color: "#000",
-                            weight: 1,
-                            opacity: 1,
-                            fillOpacity: 0.8
-                        }).bindPopup(`${def.layerName}<b><br>${feature.properties[def.popupProperty] || 'Tidak ada info'}</b>`);
-                    }
-                });
-                // Tambahkan layer ke overLayers untuk PanelLayers
-                overLayers.push({
-                    active: def.active,
-                    name: def.layerName,
-                    icon: `<i style="background:${def.markerColor}; width:18px; height:18px; border-radius:50%; display:inline-block; margin-right:8px;"></i>`, // Simbol di panel
-                    layer: geoJsonLayer
-                });
-            })
-            .catch(error => {
-                console.error(`Error loading ${def.filePath}:`, error);
-            });
-        fetchPromises.push(promise);
-    }
+     var overLayers = [];
+     var fetchPromises = [];
 
-    // Muat semua data
-    layerDefinitions.forEach(def => loadGeoJSONForPanel(def));
+     // Fungsi untuk memuat dan menambahkan data GeoJSON ke overLayers dengan ikon
+     function loadGeoJSONForPanel(def) {
+         const promise = fetch(def.filePath)
+             .then(response => {
+                 if (!response.ok) {
+                     throw new Error(`HTTP error! status: ${response.status} from ${def.filePath}`);
+                 }
+                 return response.json();
+             })
+             .then(data => {
+                 var geoJsonLayer = L.geoJSON(data, {
+                     pointToLayer: function (feature, latlng) {
+                         let popupContent = `<b>${def.layerName}</b><br>`;
+                         popupContent += `${def.popupProperty}: ${feature.properties ? feature.properties?.[def.popupProperty] || 'Tidak ada info' : 'Tidak ada info'}<br>`;
 
-    // Tunggu semua data dimuat, lalu inisialisasi panel dan kontrol lainnya
-    Promise.all(fetchPromises)
-        .then(() => {
-            // Atur overLayers dalam grup
-            var groupedOverLayers = [
-                {
-                    group: "JARINGAN PERSAMPAHAN",
-                    collapsed: false,
-                    layers: overLayers
-                }
-            ];
+                         if (feature.properties) {
+                             for (const key in feature.properties) {
+                                 if (feature.properties.hasOwnProperty(key) && key !== def.popupProperty && key.toLowerCase() !== 'id' && key !== def.iconProperty) {
+                                     popupContent += `<b>${key.replace(/_/g, ' ')}</b>: ${feature.properties?.[key]}<br>`;
+                                 }
+                                 // Tambahkan foto jika ada
+                                 if ((key === 'Foto' || key === 'photo') && feature.properties?.[key] !== "") {
+                                     popupContent += `<img src="${feature.properties?.[key]}" alt="Image" class="popup-image">`;
+                                 }
+                             }
+                         }
 
-            var panelLayers = new L.Control.PanelLayers(baseLayers, groupedOverLayers, {
-                compact: true, // Membuat panel lebih ringkas
-                collapsed: false, // Panel awalnya tertutup
-                selectorGroup: true, // Opsi untuk radio button dalam grup (jika layer bersifat eksklusif)
-                collapsibleGroups: true // Memungkinkan grup untuk diciutkan/dibuka
-            });
+                         let customIcon = null;
+                         if (def.iconProperty && feature.properties?.[def.iconProperty]) {
+                             const iconName = def.iconMapping?.[feature.properties?.[def.iconProperty]];
+                             if (iconName) {
+                                 customIcon = L.icon({
+                                     iconUrl: `images/icons/${iconName}`,
+                                     iconSize: [24, 24], // Sesuaikan ukuran ikon
+                                     iconAnchor: [12, 12], // Sesuaikan titik tengah ikon
+                                     popupAnchor: [0, -12] // Sesuaikan posisi popup relatif terhadap ikon
+                                 });
+                             }
+                         } else if (def.iconMapping && Object.keys(def.iconMapping).length > 0) {
+                             // Jika iconProperty tidak ada, coba gunakan nama layer sebagai kunci pertama di iconMapping
+                             const defaultIconKey = Object.keys(def.iconMapping)[0];
+                             const iconName = def.iconMapping?.[defaultIconKey];
+                             if (iconName) {
+                                 customIcon = L.icon({
+                                     iconUrl: `images/icons/${iconName}`,
+                                     iconSize: [24, 24],
+                                     iconAnchor: [12, 12],
+                                     popupAnchor: [0, -12]
+                                 });
+                             }
+                         }
 
-            map.addControl(panelLayers);
+                         if (customIcon) {
+                             return L.marker(latlng, { icon: customIcon }).bindPopup(popupContent);
+                         } else {
+                             // Jika tidak ada ikon yang sesuai, gunakan marker default (atau bisa juga circleMarker seperti sebelumnya)
+                             return L.circleMarker(latlng, {
+                                 radius: 6,
+                                 fillColor: def.markerColor,
+                                 color: "#000",
+                                 weight: 1,
+                                 opacity: 1,
+                                 fillOpacity: 0.8
+                             }).bindPopup(popupContent);
+                         }
+                     }
+                 });
+                 overLayers.push({
+                     active: def.active,
+                     name: def.layerName,
+                     icon: `<img src="images/icons/${def.iconMapping?.[Object.keys(def.iconMapping)[0]] || 'default_icon.png'}" style="width: 18px; height: 18px; margin-right: 8px; vertical-align: middle;">`, // Gunakan ikon di panel layer
+                     layer: geoJsonLayer
+                 });
+             })
+             .catch(error => {
+                 console.error(`Error loading ${def.filePath}:`, error);
+             });
+         fetchPromises.push(promise);
+     }
 
-        //urusan fullscreen
-        map.isFullscreen() // Is the map fullscreen?
-        map.toggleFullscreen() // Either go fullscreen, or cancel the existing fullscreen.
+     layerDefinitions.forEach(def => loadGeoJSONForPanel(def));
 
-        // `fullscreenchange` Event that's fired when entering or exiting fullscreen.
-        map.on('fullscreenchange', function () {
-            if (map.isFullscreen()) {
-                console.log('entered fullscreen');
-                } else {
-                console.log('exited fullscreen');
-            }
-        });
+     Promise.all(fetchPromises)
+         .then(() => {
+             var groupedOverLayers = [
+                 {
+                     group: "JARINGAN PERSAMPAHAN",
+                     collapsed: false,
+                     layers: overLayers
+                 }
+             ];
 
-        map.addControl(new L.Control.Fullscreen({
-            title: {
-                'false': 'View Fullscreen',
-                'true': 'Exit Fullscreen'
-            }
-        }));
+             var panelLayers = new L.Control.PanelLayers(baseLayers, groupedOverLayers, {
+                 compact: true,
+                 collapsed: false,
+                 selectorGroup: true,
+                 collapsibleGroups: true
+             });
 
-        // Tambahkan skala bar
-        L.control.scale({
-        position: 'bottomleft', // Posisikan di kiri bawah
-        imperial: true,        // Tampilkan mil
-        metric: true           // Tampilkan kilometer
-        }).addTo(map);
+             map.addControl(panelLayers);
 
-        console.log('Semua layer dimuat, Panel Layers, Fullscreen Control, dan Skala telah dibuat.');
+             map.isFullscreen();
+             map.toggleFullscreen();
 
-        // Tambahkan layer ke peta setelah panel layers diinisialisasi
-        // agar mereka terlihat secara default jika 'active: true'
-        overLayers.forEach(layerItem => {
-            if (layerItem.active) {
-            map.addLayer(layerItem.layer);
-            }
-        });
+             map.on('fullscreenchange', function () {
+                 if (map.isFullscreen()) {
+                     console.log('entered fullscreen');
+                 } else {
+                     console.log('exited fullscreen');
+                 }
+             });
 
-    })
-    .catch(error => {
-        console.error('Ada kesalahan saat memuat salah satu layer:', error);
-    });
+             map.addControl(new L.Control.Fullscreen({
+                 title: {
+                     'false': 'Lihat Layar Penuh',
+                     'true': 'Keluar Layar Penuh'
+                 }
+             }));
 
-</script>
-</body>
-</html>
+             L.control.scale({
+                 position: 'bottomleft',
+                 imperial: true,
+                 metric: true
+             }).addTo(map);
+
+             console.log('Semua layer dimuat, Panel Layers, Fullscreen Control, dan Skala telah dibuat.');
+
+             overLayers.forEach(layerItem => {
+                 if (layerItem.active) {
+                     map.addLayer(layerItem.layer);
+                 }
+             });
+
+         })
+         .catch(error => {
+             console.error('Ada kesalahan saat memuat salah satu layer:', error);
+         });
+
+ </script>
+ </body>
+ </html>
