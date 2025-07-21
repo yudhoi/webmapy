@@ -1,0 +1,24 @@
+{
+"type": "FeatureCollection",
+"name": "sumur_pantau",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Name": "Point 1", "Lokasi": "Komplek UNY YK Depok SP-SLM 1 (Th 2006)", "Kdlmn": 7.62 }, "geometry": { "type": "Point", "coordinates": [ 110.385528800339259, -7.774688299986419, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Point 2", "Lokasi": "Pandowoharjo, Sleman SP-SLM 2 (Th 2009)", "Kdlmn": 9.23 }, "geometry": { "type": "Point", "coordinates": [ 110.369136699665816, -7.700445999565815, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Point 3", "Lokasi": "Sardonoharjo, Ngaglik SP-SLM 3 (Th 2009)", "Kdlmn": 1.35 }, "geometry": { "type": "Point", "coordinates": [ 110.398698300033814, -7.709469999870292, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Point 4", "Lokasi": "Tirtomartani, Kalasan SP-SLM 4 (Th 2010)", "Kdlmn": 5.54 }, "geometry": { "type": "Point", "coordinates": [ 110.471133899968194, -7.761984099740995, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Point 5", "Lokasi": "Trihanggo, Gamping SP-SLM 5 (Th 2011)", "Kdlmn": 6.4 }, "geometry": { "type": "Point", "coordinates": [ 110.345761800252816, -7.752981900235095, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Point 6", "Lokasi": "FT UGM, Mlati Sleman SP-SLM 6 (Th 2012)", "Kdlmn": 8.35 }, "geometry": { "type": "Point", "coordinates": [ 110.37234119959173, -7.76529119970692, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Point 7", "Lokasi": "Komplek H. Ambarukmo SP-SLM 7 (Th 2012)", "Kdlmn": 5.5 }, "geometry": { "type": "Point", "coordinates": [ 110.402489399840263, -7.781602900119402, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Point 8", "Lokasi": "Kantor Desa Widodomartani, Ngemplak SP-SLM 8 (Th 2013)", "Kdlmn": 5.36 }, "geometry": { "type": "Point", "coordinates": [ 110.434653399823389, -7.731389000028166, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Point 9", "Lokasi": "UPN V YK Depok SP-SLM 9 (Th 2014)", "Kdlmn": 11.75 }, "geometry": { "type": "Point", "coordinates": [ 110.409266799688424, -7.762253799745657, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Point 10", "Lokasi": "Jogotirto, Berbah SP-SLM 10 (Th 2016)", "Kdlmn": 11.75 }, "geometry": { "type": "Point", "coordinates": [ 110.470818399962312, -7.813901299750755, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Point 11", "Lokasi": "Sumberagung, Moyudan SP-SLM 11 (Th 2016)", "Kdlmn": 5.0 }, "geometry": { "type": "Point", "coordinates": [ 110.250871100297886, -7.767201699797473, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Point 12", "Lokasi": "Tlogoadi, Mlati SP-SLM 12 (2016)", "Kdlmn": 1.58 }, "geometry": { "type": "Point", "coordinates": [ 110.345663299981908, -7.732466800303759, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Point 13", "Lokasi": "Pakem SP-SLM 13 (Th 2016)", "Kdlmn": 8.3 }, "geometry": { "type": "Point", "coordinates": [ 110.414076999557153, -7.640006300123597, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Point 14", "Lokasi": "Tempel SP-SLM 14 (Th 2017)", "Kdlmn": 5.04 }, "geometry": { "type": "Point", "coordinates": [ 110.318051700448905, -7.663911100132628, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Point 15", "Lokasi": "Turi, SP SLM 15 (Th.2018)", "Kdlmn": 3.82 }, "geometry": { "type": "Point", "coordinates": [ 110.384164999634478, -7.62505729964468, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Point 16", "Lokasi": "Godean SP SLM 16 (Th.2018)", "Kdlmn": 5.44 }, "geometry": { "type": "Point", "coordinates": [ 110.293359400112166, -7.766750400211879, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Point 17", "Lokasi": "Hartono Mall SP SLM 17 (Th 2021)", "Kdlmn": 8.67 }, "geometry": { "type": "Point", "coordinates": [ 110.399200107036364, -7.758601249204096, 0.0 ] } }
+]
+}

@@ -1,0 +1,23 @@
+{
+"type": "FeatureCollection",
+"name": "lokasi_IKU_2024",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Peruntukan": "Perkantoran", "Kawasan": "Sleman Utara", "Pelaksana": "DLH Sleman" }, "geometry": { "type": "Point", "coordinates": [ 110.392370000335518, -7.670379999684827 ] } },
+{ "type": "Feature", "properties": { "Peruntukan": "Transportasi", "Kawasan": "Sleman Utara", "Pelaksana": "DLH Sleman" }, "geometry": { "type": "Point", "coordinates": [ 110.398749999875037, -7.620300000339213 ] } },
+{ "type": "Feature", "properties": { "Peruntukan": "Industri", "Kawasan": "Sleman Utara", "Pelaksana": "DLH Sleman" }, "geometry": { "type": "Point", "coordinates": [ 110.369320000001224, -7.64647999983673 ] } },
+{ "type": "Feature", "properties": { "Peruntukan": "Pemukiman", "Kawasan": "Sleman Utara", "Pelaksana": "DLH Sleman" }, "geometry": { "type": "Point", "coordinates": [ 110.398670000407407, -7.636299999674868 ] } },
+{ "type": "Feature", "properties": { "Peruntukan": "Perkantoran", "Kawasan": "Sleman Timur", "Pelaksana": "DLH Sleman" }, "geometry": { "type": "Point", "coordinates": [ 110.520669999717697, -7.819000000030368 ] } },
+{ "type": "Feature", "properties": { "Peruntukan": "Transportasi", "Kawasan": "Sleman Timur", "Pelaksana": "DLH Sleman" }, "geometry": { "type": "Point", "coordinates": [ 110.492619999868168, -7.776770000043537 ] } },
+{ "type": "Feature", "properties": { "Peruntukan": "Industri", "Kawasan": "Sleman Timur", "Pelaksana": "DLH Sleman" }, "geometry": { "type": "Point", "coordinates": [ 110.461919999574903, -7.745930000150061 ] } },
+{ "type": "Feature", "properties": { "Peruntukan": "Pemukiman", "Kawasan": "Sleman Timur", "Pelaksana": "DLH Sleman" }, "geometry": { "type": "Point", "coordinates": [ 110.503500000229025, -7.813449999757935 ] } },
+{ "type": "Feature", "properties": { "Peruntukan": "Perkantoran", "Kawasan": "Sleman Tengah", "Pelaksana": "DLHK DIY" }, "geometry": { "type": "Point", "coordinates": [ 110.355329999787401, -7.715560000316508 ] } },
+{ "type": "Feature", "properties": { "Peruntukan": "Transportasi", "Kawasan": "Sleman Tengah", "Pelaksana": "DLHK DIY" }, "geometry": { "type": "Point", "coordinates": [ 110.380390000332866, -7.691780000338457 ] } },
+{ "type": "Feature", "properties": { "Peruntukan": "Industri", "Kawasan": "Sleman Tengah", "Pelaksana": "DLHK DIY" }, "geometry": { "type": "Point", "coordinates": [ 110.389919999908315, -7.763940000073924 ] } },
+{ "type": "Feature", "properties": { "Peruntukan": "Pemukiman", "Kawasan": "Sleman Tengah", "Pelaksana": "DLHK DIY" }, "geometry": { "type": "Point", "coordinates": [ 110.376650000293012, -7.7079499999849 ] } },
+{ "type": "Feature", "properties": { "Peruntukan": "Perkantoran", "Kawasan": "Sleman Barat", "Pelaksana": "DLHK DIY" }, "geometry": { "type": "Point", "coordinates": [ 110.233349999670295, -7.766629999813334 ] } },
+{ "type": "Feature", "properties": { "Peruntukan": "Transportasi", "Kawasan": "Sleman Barat", "Pelaksana": "DLHK DIY" }, "geometry": { "type": "Point", "coordinates": [ 110.23327000020268, -7.736070000310685 ] } },
+{ "type": "Feature", "properties": { "Peruntukan": "Industri", "Kawasan": "Sleman Barat", "Pelaksana": "DLHK DIY" }, "geometry": { "type": "Point", "coordinates": [ 110.236079999581648, -7.809680000269105 ] } },
+{ "type": "Feature", "properties": { "Peruntukan": "Pemukiman", "Kawasan": "Sleman Barat", "Pelaksana": "DLHK DIY" }, "geometry": { "type": "Point", "coordinates": [ 110.251209999620272, -7.761309999841776 ] } }
+]
+}
