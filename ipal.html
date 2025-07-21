@@ -78,9 +78,9 @@
  <body>
  <div id="map"></div>
  <div class="map-header">
-     <div class="map-title">Peta Layanan Persampahan</div>
+     <div class="map-title">Peta Pengolahan Limbah Domestik</div>
      <div class="map-subtitle">
-         Visualisasi layanan persampahan<br>
+         Visualisasi jaringan pengolahan limbah domestik<br>
          Informasi ini penting untuk pengelolaan sampah yang lebih baik.
      </div>
  </div>
@@ -112,22 +112,42 @@
      // Mapping nama layer ke nama properti yang menentukan jenis objek dan mapping nilai properti ke ikon
      var layerDefinitions = [
          {
-             filePath: 'json/uptd/pelanggan.geojson',
-             layerName: 'PELANGGAN LAYANAN SAMPAH',
-             popupProperty: 'Pelanggan',
+             filePath: 'json/ipal/IPAL_SKALA_KAWASAN_SLEMAN.json',
+             layerName: 'IPAL KAWASAN',
+             popupProperty: 'NAMOBJ',
              iconProperty: null, // Asumsi ada properti 'jenis' di GeoJSON yang membedakan KSM dan BKM
              iconMapping: {
-                 'Pelanggan': 'pelanggan.png'
+                 'Ipal Kawasan': 'ipalkawasan.png'
              },
              active: true
          },
          {
-             filePath: 'json/uptd/jalur.geojson',
-             layerName: 'JALUR PENGAMBILAN SAMPAH',
-             popupProperty: 'Layer',
+             filePath: 'json/ipal/IPAL_KOMUNAL_SLEMAN_2024.json',
+             layerName: 'IPAL KOMUNAL',
+             popupProperty: 'NAMOBJ',
              iconProperty: null, // Mungkin tidak perlu properti khusus, bisa gunakan ikon default
              iconMapping: {
-                 'Jalur': 'sewon.png' // Atau bisa langsung tentukan nama file jika semua sama
+                 'Ipal Komunal': 'ipalkomunal.png' // Atau bisa langsung tentukan nama file jika semua sama
+             },
+             active: true
+         },
+         {
+             filePath: 'json/ipal/JARINGAN_IPAL_SEWON_SLEMAN.json',
+             layerName: 'JARINGAN IPAL SEWON',
+             popupProperty: 'Nama', // Properti yang akan ditampilkan di popup
+             iconProperty: null, // Set null jika ini adalah layer garis dan tidak perlu ikon marker
+             iconMapping: {
+                 'Jaringan': 'sewon.png' // Ini hanya akan relevan jika data ini adalah titik dengan properti 'Depo Sampah'
+             },
+             active: true
+         },
+         {
+             filePath: 'json/ipal/IPLT_MADUREJO.json',
+             layerName: 'IPLT MADUREJO',
+             popupProperty: 'NAMOBJ',
+             iconProperty: null,
+             iconMapping: {
+                 'IPTL': 'iptl.png'
              },
              active: true
          }
@@ -149,12 +169,12 @@
                  var geoJsonLayer = L.geoJSON(data, {
                      pointToLayer: function (feature, latlng) {
                          let popupContent = `<b>${def.layerName}</b><br>`;
-                         popupContent += `${def.popupProperty}: <b>${feature.properties ? feature.properties?.[def.popupProperty] || 'Tidak ada info' : 'Tidak ada info'}</b><br>`;
+                         popupContent += `${def.popupProperty}: ${feature.properties ? feature.properties?.[def.popupProperty] || 'Tidak ada info' : 'Tidak ada info'}<br>`;
 
                          if (feature.properties) {
                              for (const key in feature.properties) {
                                  if (feature.properties.hasOwnProperty(key) && key !== def.popupProperty && key.toLowerCase() !== 'id' && key !== def.iconProperty) {
-                                     popupContent += `${key.replace(/_/g, ' ')}: <b>${feature.properties?.[key]}</b><br>`;
+                                     popupContent += `<b>${key.replace(/_/g, ' ')}</b>: ${feature.properties?.[key]}<br>`;
                                  }
                                  // Tambahkan foto jika ada
                                  if ((key === 'FOTO' || key === 'photo') && feature.properties?.[key] !== "") {
@@ -222,7 +242,7 @@
          .then(() => {
              var groupedOverLayers = [
                  {
-                     group: "PEMANTAUAN KUALITAS LINGKUNGAN HIDUP",
+                     group: "INSTALASI PENGELOLAAN AIR LIMBAH",
                      collapsed: false,
                      layers: overLayers
                  }

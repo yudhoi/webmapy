@@ -78,7 +78,7 @@
  <body>
  <div id="map"></div>
  <div class="map-header">
-     <div class="map-title">Peta Layanan Persampahan</div>
+     <div class="map-title">Peta Status Lingkungan Hidup</div>
      <div class="map-subtitle">
          Visualisasi layanan persampahan<br>
          Informasi ini penting untuk pengelolaan sampah yang lebih baik.
@@ -112,9 +112,9 @@
      // Mapping nama layer ke nama properti yang menentukan jenis objek dan mapping nilai properti ke ikon
      var layerDefinitions = [
          {
-             filePath: 'json/uptd/pelanggan.geojson',
-             layerName: 'PELANGGAN LAYANAN SAMPAH',
-             popupProperty: 'Pelanggan',
+             filePath: 'json/d3tlh/statusair.geojson',
+             layerName: 'STATUS KETERSEDIAAN AIR',
+             popupProperty: 'STTS_AIR',
              iconProperty: null, // Asumsi ada properti 'jenis' di GeoJSON yang membedakan KSM dan BKM
              iconMapping: {
                  'Pelanggan': 'pelanggan.png'
@@ -122,14 +122,14 @@
              active: true
          },
          {
-             filePath: 'json/uptd/jalur.geojson',
-             layerName: 'JALUR PENGAMBILAN SAMPAH',
-             popupProperty: 'Layer',
+             filePath: 'json/d3tlh/statuspangan.geojson',
+             layerName: 'STATUS KETERSEDIAAN PANGAN',
+             popupProperty: 'STTS_PNGAN',
              iconProperty: null, // Mungkin tidak perlu properti khusus, bisa gunakan ikon default
              iconMapping: {
                  'Jalur': 'sewon.png' // Atau bisa langsung tentukan nama file jika semua sama
              },
-             active: true
+             active: false
          }
      ];
 
@@ -147,7 +147,23 @@
              })
              .then(data => {
                  var geoJsonLayer = L.geoJSON(data, {
-                     pointToLayer: function (feature, latlng) {
+                     // Hapus bagian pointToLayer jika Anda ingin merender poligon
+                     // pointToLayer: function (feature, latlng) {
+                     //     // ... kode pointToLayer yang sudah ada ...
+                     // },
+
+                     // Tambahkan fungsi style untuk pewarnaan poligon
+                     style: function(feature) {
+                         // Ganti 'nama_atribut_anda' dengan nama atribut yang sebenarnya di GeoJSON Anda
+                         // dan sesuaikan logika pewarnaan sesuai kebutuhan
+                         switch (feature.properties?.STTS_AIR) {
+                             case 'Melampaui':
+                                 return { color: '#006400', weight: 0, opacity: 0.8, fillOpacity: 0.5, fillColor: '#ff4800ff' }; // Merah
+                             case 'Belum Melampaui':
+                                 return { color: '#DAA520', weight: 0, opacity: 0.8, fillOpacity: 0.5, fillColor: '#03fe07ff' }; // Hijau
+                         }
+                     },
+                     onEachFeature: function (feature, layer) {
                          let popupContent = `<b>${def.layerName}</b><br>`;
                          popupContent += `${def.popupProperty}: <b>${feature.properties ? feature.properties?.[def.popupProperty] || 'Tidak ada info' : 'Tidak ada info'}</b><br>`;
 
@@ -162,51 +178,14 @@
                                  }
                              }
                          }
-
-                         let customIcon = null;
-                         if (def.iconProperty && feature.properties?.[def.iconProperty]) {
-                             const iconName = def.iconMapping?.[feature.properties?.[def.iconProperty]];
-                             if (iconName) {
-                                 customIcon = L.icon({
-                                     iconUrl: `images/icons/${iconName}`,
-                                     iconSize: [24, 24], // Sesuaikan ukuran ikon
-                                     iconAnchor: [12, 12], // Sesuaikan titik tengah ikon
-                                     popupAnchor: [0, -12] // Sesuaikan posisi popup relatif terhadap ikon
-                                 });
-                             }
-                         } else if (def.iconMapping && Object.keys(def.iconMapping).length > 0) {
-                             // Jika iconProperty tidak ada, coba gunakan nama layer sebagai kunci pertama di iconMapping
-                             const defaultIconKey = Object.keys(def.iconMapping)[0];
-                             const iconName = def.iconMapping?.[defaultIconKey];
-                             if (iconName) {
-                                 customIcon = L.icon({
-                                     iconUrl: `images/icons/${iconName}`,
-                                     iconSize: [24, 24],
-                                     iconAnchor: [12, 12],
-                                     popupAnchor: [0, -12]
-                                 });
-                             }
-                         }
-
-                         if (customIcon) {
-                             return L.marker(latlng, { icon: customIcon }).bindPopup(popupContent);
-                         } else {
-                             // Jika tidak ada ikon yang sesuai, gunakan marker default (atau bisa juga circleMarker seperti sebelumnya)
-                             return L.circleMarker(latlng, {
-                                 radius: 6,
-                                 fillColor: def.markerColor,
-                                 color: "#000",
-                                 weight: 1,
-                                 opacity: 1,
-                                 fillOpacity: 0.8
-                             }).bindPopup(popupContent);
-                         }
+                         layer.bindPopup(popupContent);
                      }
                  });
                  overLayers.push({
                      active: def.active,
                      name: def.layerName,
-                     icon: `<img src="images/icons/${def.iconMapping?.[Object.keys(def.iconMapping)[0]] || 'default_icon.png'}" style="width: 18px; height: 18px; margin-right: 8px; vertical-align: middle;">`, // Gunakan ikon di panel layer
+                     // Anda bisa ganti ikon di sini jika perlu, atau hapus jika tidak relevan untuk poligon
+                     // icon: `<img src="images/icons/${def.iconMapping?.[Object.keys(def.iconMapping)[0]] || 'default_icon.png'}" style="width: 18px; height: 18px; margin-right: 8px; vertical-align: middle;">`,
                      layer: geoJsonLayer
                  });
              })

@@ -78,9 +78,9 @@
  <body>
  <div id="map"></div>
  <div class="map-header">
-     <div class="map-title">Peta Layanan Persampahan</div>
+     <div class="map-title">Peta Pemantauan Kualitas Lingkungan</div>
      <div class="map-subtitle">
-         Visualisasi layanan persampahan<br>
+         Visualisasi jaringan pemantauan lingkungan hidup<br>
          Informasi ini penting untuk pengelolaan sampah yang lebih baik.
      </div>
  </div>
@@ -112,22 +112,62 @@
      // Mapping nama layer ke nama properti yang menentukan jenis objek dan mapping nilai properti ke ikon
      var layerDefinitions = [
          {
-             filePath: 'json/uptd/pelanggan.geojson',
-             layerName: 'PELANGGAN LAYANAN SAMPAH',
-             popupProperty: 'Pelanggan',
+             filePath: 'json/pantau/sumur_pantau.geojson',
+             layerName: 'SUMUR PANTAU',
+             popupProperty: 'Name',
              iconProperty: null, // Asumsi ada properti 'jenis' di GeoJSON yang membedakan KSM dan BKM
              iconMapping: {
-                 'Pelanggan': 'pelanggan.png'
+                 'Ipal Kawasan': 'sumur_pantau.png'
              },
              active: true
          },
          {
-             filePath: 'json/uptd/jalur.geojson',
-             layerName: 'JALUR PENGAMBILAN SAMPAH',
-             popupProperty: 'Layer',
+             filePath: 'json/pantau/lokasi_IKA_2024.geojson',
+             layerName: 'LOKASI SAMPEL KUALITAS AIR SUNGAI',
+             popupProperty: 'LOKASI',
              iconProperty: null, // Mungkin tidak perlu properti khusus, bisa gunakan ikon default
              iconMapping: {
-                 'Jalur': 'sewon.png' // Atau bisa langsung tentukan nama file jika semua sama
+                 'Kualitas Air': 'sungai.png' // Atau bisa langsung tentukan nama file jika semua sama
+             },
+             active: true
+         },
+         {
+             filePath: 'json/pantau/sumur_kualitas_2024.geojson',
+             layerName: 'LOKASI SAMPEL KUALITAS AIR SUMUR',
+             popupProperty: 'Lokasi_Sum', // Properti yang akan ditampilkan di popup
+             iconProperty: null, // Set null jika ini adalah layer garis dan tidak perlu ikon marker
+             iconMapping: {
+                 'Jaringan': 'sumur.png' // Ini hanya akan relevan jika data ini adalah titik dengan properti 'Depo Sampah'
+             },
+             active: true
+         },
+         {
+             filePath: 'json/pantau/mataair_2024.geojson',
+             layerName: 'LOKASI SAMPEL KUALITAS AIR MATA AIR',
+             popupProperty: 'MATA_AIR',
+             iconProperty: null,
+             iconMapping: {
+                 'Kualitas Air': 'mataair.png'
+             },
+             active: true
+         },
+         {
+             filePath: 'json/pantau/lokasi_IKU_2024.geojson',
+             layerName: 'LOKASI SAMPEL KUALITAS UDARA',
+             popupProperty: 'Peruntukan',
+             iconProperty: null,
+             iconMapping: {
+                 'Kualitas Udara': 'iku.png'
+             },
+             active: true
+         },
+         {
+             filePath: 'json/pantau/embung_2024.geojson',
+             layerName: 'LOKASI SAMPEL KUALITAS AIR EMBUNG',
+             popupProperty: 'Nama',
+             iconProperty: null,
+             iconMapping: {
+                 'Kualitas Air': 'embung.png'
              },
              active: true
          }

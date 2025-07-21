@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+ <html xmlns="https://www.w3.org/1999/xhtml">
+ <head>
+     <title>Peta Pengolahan Limbah Domestik</title>
+     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=0.8, maximum-scale=0.8, user-scalable=no" />
+
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+     <link rel="stylesheet" href="src/leaflet-panel-layers.css" />
+     <script src="src/leaflet-panel-layers.js"></script>
+
+     <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+     <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+
+     <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.js"></script>
+
+     <style>
+         #map {
+             height: 100vh;
+             width: 100%;
+         }
+         /* Style untuk wadah judul dan sub-judul */
+         .map-header {
+             position: absolute;
+             top: 10px;
+             left: 50%;
+             transform: translateX(-50%);
+             z-index: 1000;
+             background-color: rgba(255, 255, 255, 0.8);
+             padding: 10px 15px;
+             border-radius: 5px;
+             box-shadow: 0 0 5px rgba(0,0,0,0.3);
+             font-family: Arial, sans-serif;
+             text-align: center; /* Agar teks di tengah */
+             white-space: nowrap; /* Mencegah teks terpotong */
+         }
+         .map-title {
+             font-size: 18px;
+             font-weight: bold;
+             color: #333;
+             margin-bottom: 5px; /* Sedikit ruang di bawah judul */
+         }
+         .map-subtitle {
+             font-size: 12px;
+             color: #555;
+             line-height: 1.4; /* Jarak antar baris */
+         }
+
+         /* Tambahan style agar panel tidak tumpang tindih dengan judul */
+         .leaflet-panel-layers {
+             top: 0px !important; /* Sesuaikan dengan tinggi map-header Anda */
+
+         }
+         /* Style untuk gambar di popup */
+         .popup-image {
+             max-width: 200px; /* Batasi lebar gambar */
+             height: auto;
+             display: block; /* Agar gambar berada di baris baru */
+             margin-top: 10px; /* Sedikit ruang di atas gambar */
+         }
+
+         /* Membuat popup lebih transparan */
+         .leaflet-popup-content-wrapper {
+             background-color: rgba(255, 255, 255, 0.7) !important; /* Ubah nilai alpha (0.7) sesuai keinginan */
+             border-radius: 5px; /* Agar sudut tetap terlihat bagus */
+             box-shadow: 0 0 5px rgba(0,0,0,0.2); /* Sedikit bayangan agar tetap terlihat */
+         }
+
+         .leaflet-popup-tip {
+             background: rgba(255, 255, 255, 0.7) !important; /* Sesuaikan nilai alpha agar sesuai dengan wrapper */
+             border: none !important; /* Hilangkan border pada tip untuk tampilan lebih bersih */
+         }
+
+         /* Style for the custom legend */
+         .info.legend {
+             line-height: 18px;
+             color: #555;
+         }
+         .info.legend i {
+             width: 18px;
+             height: 18px;
+             float: left;
+             margin-right: 8px;
+             opacity: 0.7; /* Make color swatches slightly transparent like the polygons */
+         }
+     </style>
+ </head>
+
+ <body>
+ <div id="map"></div>
+ <div class="map-header">
+     <div class="map-title">Peta Timbulan Sampah</div>
+     <div class="map-subtitle">
+         Sebaran tonase timbulan sampah pada tiap kapanewon.<br>
+         Informasi ini penting untuk pengelolaan sampah yang lebih baik.
+     </div>
+ </div>
+
+ <script>
+     var map = L.map('map', {
+         zoom: 12,
+         center: L.latLng([-7.690992794458956, 110.37677710610576]),
+         attributionControl: false, // Atribusi akan ditambahkan melalui basemap
+         maxBounds: L.latLngBounds([[-7.837,110.209],[-7.539,110.557]]).pad(0.5) // Hapus atau sesuaikan jika tidak perlu
+     });
+
+     // Tambahkan basemap OpenStreetMap
+     var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+         opacity: 0.5 // Tambahkan baris ini untuk mengatur transparansi
+         
+     });
+     map.addLayer(osmLayer);
+
+     var baseLayers = [
+         {
+             name: "Open Street Map",
+             layer: osmLayer
+
+         },
+    ];
+
+     // Mapping nama layer ke nama properti yang menentukan jenis objek dan mapping nilai properti ke ikon
+     var layerDefinitions = [
+         {
+             filePath: 'json/timbulan/timbulan_sampah.geojson',
+             layerName: 'TIMBULAN SAMPAH',
+             popupProperty: 'KECAMATAN', // Properti yang akan ditampilkan sebagai judul di popup
+             // iconProperty: null, // Tidak relevan untuk poligon
+             // iconMapping: { // Tidak relevan untuk poligon
+             //     'Pelanggan': 'pelanggan.png'
+             // },
+             active: true
+         }
+     ];
+
+     var overLayers = [];
+     var fetchPromises = [];
+
+     // Global variable untuk menyimpan informasi legenda
+     let timbulanLegendInfo = null;
+
+     // Fungsi untuk memuat dan menambahkan data GeoJSON ke overLayers
+     function loadGeoJSONForPanel(def) {
+         const promise = fetch(def.filePath)
+             .then(response => {
+                 if (!response.ok) {
+                     throw new Error(`HTTP error! status: ${response.status} from ${def.filePath}`);
+                 }
+                 return response.json();
+             })
+             .then(data => {
+                 let geoJsonLayer;
+
+                 // Logika khusus untuk layer TIMBULAN SAMPAH
+                 if (def.filePath === 'json/timbulan/timbulan_sampah.geojson') {
+                     // Asumsi: Properti volume sampah adalah 'JUMLAH_VOLUME_SAMPAH'
+                     // Pastikan nama properti ini sesuai dengan data GeoJSON Anda
+                     const volumes = data.features.map(f => parseFloat(f.properties?.Timbulan_1))
+                                                 .filter(v => !isNaN(v)); // Filter out invalid numbers
+
+                     const minVolume = Math.min(50);
+                     const maxVolume = Math.max(200);
+                     const numClasses = 5;
+                     const interval = (maxVolume - minVolume) / numClasses;
+
+                     // Palet warna untuk 5 kelas (contoh: dari ColorBrewer, Sequential Blues)
+                     const colors = ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c']; // Warna terang ke gelap
+
+                     // Fungsi untuk mendapatkan warna berdasarkan volume
+                     function getVolumeColor(volume) {
+                         if (volume === undefined || volume === null || isNaN(volume)) return '#ccc'; // Warna default untuk data hilang/tidak valid
+                         if (volume >= minVolume + interval * 4) return colors[4];
+                         if (volume >= minVolume + interval * 3) return colors[3];
+                         if (volume >= minVolume + interval * 2) return colors[2];
+                         if (volume >= minVolume + interval * 1) return colors[1];
+                         return colors[0];
+                     }
+
+                     // Siapkan informasi legenda
+                     timbulanLegendInfo = {
+                         title: 'Timbulan Sampah (TPD)',
+                         classes: [],
+                         colors: colors
+                     };
+                     for (let i = 0; i < numClasses; i++) {
+                         const lowerBound = (minVolume + interval * i).toFixed(2);
+                         let upperBound = (minVolume + interval * (i + 1)).toFixed(2);
+                         if (i === numClasses - 1) { // Untuk kelas terakhir, pastikan mencakup nilai maksimum
+                             upperBound = maxVolume.toFixed(2);
+                         }
+                         timbulanLegendInfo.classes.push(`${lowerBound} - ${upperBound}`);
+                     }
+
+                     geoJsonLayer = L.geoJSON(data, {
+                         style: function(feature) {
+                             return {
+                                 fillColor: getVolumeColor(parseFloat(feature.properties?.Timbulan_1)),
+                                 weight: 0, // Ketebalan garis batas
+                                 opacity: 0.8, // Opasitas garis batas
+                                 color: 'white', // Warna garis batas
+                                 dashArray: '3', // Garis batas putus-putus
+                                 fillOpacity: 0.7 // Opasitas isian poligon
+                             };
+                         },
+                         onEachFeature: function (feature, layer) {
+                             let popupContent = `<b>${def.layerName}</b><br>`;
+                             popupContent += `${def.popupProperty}: <b>${feature.properties ? feature.properties?.[def.popupProperty] || 'Tidak ada info' : 'Tidak ada info'}</b><br>`;
+
+                             if (feature.properties) {
+                                 for (const key in feature.properties) {
+                                     // Abaikan properti yang sudah ditampilkan atau tidak relevan untuk popup
+                                     if (feature.properties.hasOwnProperty(key) &&
+                                         key !== def.popupProperty &&
+                                         key.toLowerCase() !== 'id' &&
+                                         key.toLowerCase() !== 'objectid' && // Tambahkan objectid jika ada
+                                         key.toLowerCase() !== 'shape_leng' && // Tambahkan shape_leng jika ada
+                                         key.toLowerCase() !== 'shape_area' && // Tambahkan shape_area jika ada
+                                         key.toLowerCase() !== 'stts_air' && // Hapus stts_air yang tidak relevan
+                                         key.toLowerCase() !== 'foto' && // Tangani foto secara terpisah
+                                         key.toLowerCase() !== 'photo' && // Tangani photo secara terpisah
+                                         key !== 'JUMLAH_VOLUME_SAMPAH' // Abaikan properti yang digunakan untuk pewarnaan
+                                     ) {
+                                         popupContent += `${key.replace(/_/g, ' ')}: <b>${feature.properties?.[key]}</b><br>`;
+                                     }
+                                     // Tambahkan foto jika ada
+                                     if ((key === 'FOTO' || key === 'photo') && feature.properties?.[key] !== "") {
+                                         popupContent += `<img src="${feature.properties?.[key]}" alt="Image" class="popup-image">`;
+                                     }
+                                 }
+                                 // Tambahkan volume sampah ke popup
+                                 if (feature.properties?.JUMLAH_VOLUME_SAMPAH !== undefined) {
+                                     popupContent += `Volume Sampah: <b>${parseFloat(feature.properties.JUMLAH_VOLUME_SAMPAH).toFixed(2)}</b><br>`;
+                                 }
+                             }
+                             layer.bindPopup(popupContent);
+                         }
+                     });
+                 } else {
+                     // Logika default untuk layer lain jika ada (saat ini hanya satu layer)
+                     geoJsonLayer = L.geoJSON(data, {
+                         style: function(feature) {
+                             return {
+                                 color: "#000",
+                                 weight: 1,
+                                 opacity: 1,
+                                 fillOpacity: 0.8,
+                                 fillColor: '#808080' // Warna abu-abu default
+                             };
+                         },
+                         onEachFeature: function (feature, layer) {
+                             let popupContent = `<b>${def.layerName}</b><br>`;
+                             popupContent += `${def.popupProperty}: <b>${feature.properties ? feature.properties?.[def.popupProperty] || 'Tidak ada info' : 'Tidak ada info'}</b><br>`;
+
+                             if (feature.properties) {
+                                 for (const key in feature.properties) {
+                                     if (feature.properties.hasOwnProperty(key) && key !== def.popupProperty && key.toLowerCase() !== 'id' && key !== def.iconProperty) {
+                                         popupContent += `${key.replace(/_/g, ' ')}: <b>${feature.properties?.[key]}</b><br>`;
+                                     }
+                                     if ((key === 'FOTO' || key === 'photo') && feature.properties?.[key] !== "") {
+                                         popupContent += `<img src="${feature.properties?.[key]}" alt="Image" class="popup-image">`;
+                                     }
+                                 }
+                             }
+                             layer.bindPopup(popupContent);
+                         }
+                     });
+                 }
+
+                 overLayers.push({
+                     active: def.active,
+                     name: def.layerName,
+                     // Hapus ikon di panel layer karena ini adalah poligon
+                     // icon: `<img src="images/icons/${def.iconMapping?.[Object.keys(def.iconMapping)[0]] || 'default_icon.png'}" style="width: 18px; height: 18px; margin-right: 8px; vertical-align: middle;">`,
+                     layer: geoJsonLayer
+                 });
+             })
+             .catch(error => {
+                 console.error(`Error loading ${def.filePath}:`, error);
+             });
+         fetchPromises.push(promise);
+     }
+
+     layerDefinitions.forEach(def => loadGeoJSONForPanel(def));
+
+     Promise.all(fetchPromises)
+         .then(() => {
+             var groupedOverLayers = [
+                 {
+                     group: "PEMANTAUAN KUALITAS LINGKUNGAN HIDUP",
+                     collapsed: false,
+                     layers: overLayers
+                 }
+             ];
+
+             var panelLayers = new L.Control.PanelLayers(baseLayers, groupedOverLayers, {
+                 compact: true,
+                 collapsed: false,
+                 selectorGroup: true,
+                 collapsibleGroups: true
+             });
+
+             map.addControl(panelLayers);
+
+             map.isFullscreen();
+             map.toggleFullscreen();
+
+             map.on('fullscreenchange', function () {
+                 if (map.isFullscreen()) {
+                     console.log('entered fullscreen');
+                 } else {
+                     console.log('exited fullscreen');
+                 }
+             });
+
+             map.addControl(new L.Control.Fullscreen({
+                 title: {
+                     'false': 'Lihat Layar Penuh',
+                     'true': 'Keluar Layar Penuh'
+                 }
+             }));
+
+             L.control.scale({
+                 position: 'bottomleft',
+                 imperial: true,
+                 metric: true
+             }).addTo(map);
+
+             // Tambahkan kontrol legenda di sini setelah data dimuat
+             if (timbulanLegendInfo) {
+                 var legend = L.control({ position: 'bottomright' });
+
+                 legend.onAdd = function (map) {
+                     var div = L.DomUtil.create('div', 'info legend');
+                     // Konten judul legenda sudah diatur di CSS
+                     div.innerHTML += '<b>' + timbulanLegendInfo.title + '</b><br>';
+
+                     // Loop melalui kelas dan warnanya
+                     for (var i = 0; i < timbulanLegendInfo.classes.length; i++) {
+                         div.innerHTML +=
+                             '<i style="background:' + timbulanLegendInfo.colors[i] + '"></i> ' +
+                             timbulanLegendInfo.classes[i] + '<br>';
+                     }
+                     return div;
+                 };
+                 legend.addTo(map);
+             }
+
+
+             console.log('Semua layer dimuat, Panel Layers, Fullscreen Control, dan Skala telah dibuat.');
+
+             overLayers.forEach(layerItem => {
+                 if (layerItem.active) {
+                     map.addLayer(layerItem.layer);
+                 }
+             });
+
+         })
+         .catch(error => {
+             console.error('Ada kesalahan saat memuat salah satu layer:', error);
+         });
+
+ </script>
+ </body>
+ </html>
